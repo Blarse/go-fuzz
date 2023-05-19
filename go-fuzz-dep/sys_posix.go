@@ -9,7 +9,7 @@ package gofuzzdep
 import (
 	"syscall"
 
-	. "github.com/dvyukov/go-fuzz/go-fuzz-defs"
+	. "github.com/blarse/go-fuzz/go-fuzz-defs"
 )
 
 type FD int
