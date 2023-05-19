@@ -24,6 +24,7 @@ import (
 	"text/template"
 	"unicode"
 	"unicode/utf8"
+	"regexp"
 
 	"golang.org/x/tools/go/packages"
 
@@ -41,6 +42,7 @@ var (
 	flagBuildX    = flag.Bool("x", false, "print the commands if build fails")
 	flagPreserve  = flag.String("preserve", "", "a comma-separated list of import paths not to instrument")
 	flagGoCmd     = flag.String("go", "go", `path to "go" command`)
+	flagInstrPkgs = flag.String("instrpkgs", "", `regexp for packages to instrument`)
 )
 
 func makeTags() string {
@@ -719,6 +721,15 @@ func (c *Context) instrumentPackages(blocks *[]CoverBlock, sonar *[]CoverBlock) 
 		if c.ignore[pkg.PkgPath] {
 			return
 		}
+
+		if *flagInstrPkgs != "" {
+			if matched, _ := regexp.MatchString(*flagInstrPkgs, pkg.PkgPath); !matched {
+				fmt.Printf("Skipping: %s\n", pkg.PkgPath)
+				return
+			}
+		}
+
+		fmt.Printf("Instrumenting: %s\n", pkg.PkgPath)
 
 		root := "goroot"
 		if !c.std[pkg.PkgPath] {
